@@ -3,6 +3,7 @@ name: Daily Commit
 on:
   schedule:
     - cron: "0 0 * * *"
+
   workflow_dispatch:
 
 jobs:
@@ -22,10 +23,10 @@ jobs:
 
       - name: Commit and Push
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "Ajendranath"
+          git config user.email "YOUR_VERIFIED_GITHUB_EMAIL"
 
           git add .
-          git commit -m "daily update" || exit 0
+          git commit -m "daily update $(date)" || exit 0
 
           git push
