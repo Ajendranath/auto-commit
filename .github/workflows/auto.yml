@@ -2,31 +2,44 @@ name: Daily Commit
 
 on:
   schedule:
-    - cron: "0 0 * * *"
+    # 11:30 PM IST every day (18:00 UTC)
+    - cron: "0 18 * * *"
 
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  commit:
+  daily-commit:
     runs-on: ubuntu-latest
 
-    permissions:
-      contents: write
-
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Update file
+      - name: Configure Git
         run: |
-          echo "$(date)" >> daily.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-      - name: Commit and Push
+      - name: Update Activity Log
         run: |
-          git config user.name "Ajendranath"
-          git config user.email "YOUR_VERIFIED_GITHUB_EMAIL"
+          echo "activity on $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> activity.log
 
-          git add .
-          git commit -m "daily update $(date)" || exit 0
+      - name: Commit Changes
+        run: |
+          git add activity.log
 
-          git push
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+            exit 0
+          fi
+
+          git commit -m "chore: daily activity"
+
+      - name: Push Changes
+        run: |
+          git push origin main
